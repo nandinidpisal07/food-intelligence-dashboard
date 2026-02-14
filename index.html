@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Food Intelligence Advanced</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+}
+
+.container {
+  padding: 40px;
+}
+
+h1 { margin-bottom: 5px; }
+.subtitle { opacity: 0.8; margin-bottom: 30px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  padding: 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  padding: 10px;
+  background: #00c9a7;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover { background: #00a98b; }
+
+.progress, .water-bar {
+  height: 12px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.progress-fill, .water-fill {
+  height: 100%;
+  background: #00ffcc;
+  width: 0%;
+  transition: width 0.5s ease-in-out;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1 id="welcome">Food Intelligence</h1>
+  <div class="subtitle">Advanced Functional Nutrition Dashboard</div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>User Profile</h3>
+      <input id="name" placeholder="Your Name">
+      <input id="weight" placeholder="Weight (kg)">
+      <input id="height" placeholder="Height (cm)">
+      <select id="goal">
+        <option value="maintain">Maintain</option>
+        <option value="lose">Lose Weight</option>
+        <option value="gain">Gain Weight</option>
+      </select>
+      <button onclick="calculate()">Calculate</button>
+      <p id="bmi"></p>
+    </div>
+
+    <div class="card">
+      <h3>Daily Nutrition</h3>
+      <p id="calories">Calories: --</p>
+      <div class="progress"><div id="calorieBar" class="progress-fill"></div></div>
+      <p id="protein">Protein: --</p>
+      <div class="progress"><div id="proteinBar" class="progress-fill"></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Water Intake</h3>
+      <p id="waterText">-- L/day</p>
+      <div class="water-bar"><div id="waterFill" class="water-fill"></div></div>
+      <button onclick="addWater()">+250ml</button>
+      <button onclick="resetWater()">Reset</button>
+    </div>
+
+    <div class="card">
+      <h3>Meal Plan</h3>
+      <ul id="mealPlan">
+        <li>Breakfast: --</li>
+        <li>Lunch: --</li>
+        <li>Dinner: --</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let waterConsumed = 0;
+let waterTarget = 0;
+
+function calculate(){
+  let name = document.getElementById("name").value || "User";
+  document.getElementById("welcome").innerText = "Welcome, " + name;
+
+  let weight = parseFloat(document.getElementById("weight").value);
+  let height = parseFloat(document.getElementById("height").value);
+  let goal = document.getElementById("goal").value;
+
+  if(!weight || !height) return;
+
+  let bmi = weight / ((height/100)*(height/100));
+  document.getElementById("bmi").innerText = "BMI: " + bmi.toFixed(1);
+
+  let calories = weight * 30;
+  if(goal === "lose") calories -= 300;
+  if(goal === "gain") calories += 300;
+
+  document.getElementById("calories").innerText = "Calories: " + calories + " kcal";
+  document.getElementById("calorieBar").style.width = "100%";
+
+  let protein = Math.round(weight * 1.2);
+  document.getElementById("protein").innerText = "Protein: " + protein + " g";
+  document.getElementById("proteinBar").style.width = "100%";
+
+  waterTarget = weight * 0.035;
+  document.getElementById("waterText").innerText = waterTarget.toFixed(1) + " L/day";
+
+  generateMealPlan(goal);
+}
+
+function addWater(){
+  if(!waterTarget) return;
+  waterConsumed += 0.25;
+  let percent = (waterConsumed / waterTarget) * 100;
+  document.getElementById("waterFill").style.width = percent + "%";
+}
+
+function resetWater(){
+  waterConsumed = 0;
+  document.getElementById("waterFill").style.width = "0%";
+}
+
+function generateMealPlan(goal){
+  let meals = {
+    maintain: ["Oats & Fruits","Roti + Dal + Sabzi","Light Rice & Veggies"],
+    lose: ["Boiled Eggs & Fruits","Grilled Veg + Salad","Soup & Light Protein"],
+    gain: ["Paneer & Nuts","Rice + Dal + Sabzi","Milk + Banana Shake"]
+  };
+
+  let selected = meals[goal];
+  document.getElementById("mealPlan").innerHTML =
+    "<li>Breakfast: "+selected[0]+"</li>"+
+    "<li>Lunch: "+selected[1]+"</li>"+
+    "<li>Dinner: "+selected[2]+"</li>";
+}
+</script>
+
+</body>
+</html>
